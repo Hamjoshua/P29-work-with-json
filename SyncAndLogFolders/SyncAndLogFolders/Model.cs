@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,12 +37,14 @@ namespace SyncAndLogFolders
 
         public void SyncWith(SyncDirectory sourceDirectory, bool removeMissingItems, bool overwriteDuplicates)
         {
+            StartLog();
             CopySourceFiles(sourceDirectory, overwriteDuplicates);
 
             if (removeMissingItems)
             {
                 RemoveMissingFromSource(sourceDirectory);
             }
+            LogManager.Shutdown();
         }
 
         private void RemoveMissingFromSource(SyncDirectory sourceDirectory)
@@ -53,6 +56,7 @@ namespace SyncAndLogFolders
                 if (counterOfSameFiles == 0 && !ChangedFiles.Contains(originalFile.Name))
                 {
                     File.Delete(originalFile.FullName);
+                    WriteToLog("Removed file", originalFile.Name);
                 }
             }
         }
@@ -85,6 +89,7 @@ namespace SyncAndLogFolders
                             string otherDuplicateFilePath = Path.Combine(sourceDirectory.Directory.FullName, newFileName);
                             sourceFile.MoveTo(otherDuplicateFilePath);
                         }
+                        WriteToLog("Added file", sourceFile.Name);
                         sourceFile.CopyTo(newDuplicateFilePath);
                         continue;
                     }
@@ -96,10 +101,37 @@ namespace SyncAndLogFolders
                 {
                     if (sameFile.Length != sourceFile.Length)
                     {
+                        WriteToLog("Changed file", sameFile.Name);
                         ChangedFiles.Add(sourceFile.Name);
                     }
                 }
+                else
+                {
+                    WriteToLog("Added file", sourceFile.Name);
+                }
             }
         }
+
+        private void StartLog()
+        {
+            LogManager.GetCurrentClassLogger().Info(Directory.Name);
+        }
+
+        private void WriteToLog(string operationText, string fileName)
+        {
+            Operation operation = new Operation(operationText, fileName);
+            LogManager.GetCurrentClassLogger().WithProperty("operations", operation);
+        }
+    }
+}
+
+class Operation{
+    public string type;
+    public string file;
+
+    public Operation(string someType, string someFile)
+    {
+        type = someType;
+        file = someFile;
     }
 }

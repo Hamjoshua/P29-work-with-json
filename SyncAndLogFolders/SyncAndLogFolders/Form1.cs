@@ -22,6 +22,11 @@ namespace SyncAndLogFolders
         public Form1()
         {
             InitializeComponent();
+            chooseImitatorFolderButton.Click += chooseImitatorFolderButton_Click;
+            chooseOriginalFolderButton.Click += chooseOriginalFolderButton_Click;
+            syncImitatorWithOriginalToolStripMenuItem.Click += syncImitatorWithOriginalToolStripMenuItem_Click;
+            syncOriginalWithImitatorToolStripMenuItem.Click += оригиналПоИмитаторуToolStripMenuItem_Click;
+            syncTwoFouldersToolStripMenuItem.Click += syncTwoFouldersToolStripMenuItem_Click;
         }
 
         private string SelectFolderFromDialog()
@@ -211,6 +216,11 @@ namespace SyncAndLogFolders
         void InitOriginalListView()
         {
             InitListViews(OriginalFolder, ref originalListView, ref _imageOriginalList);
+        }
+
+        private void chooseImitatorFolderButton_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 }
